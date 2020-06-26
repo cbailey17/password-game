@@ -1,10 +1,15 @@
 #include <iostream>
 #include <fstream>
+#include <iterator>
+#include <algorithm>
 #include <map>
+#include <set>
 #include <string>
 #include <sstream>
 #include <vector>
+#include <time.h>
 
+//#include "PassWordGenerator.h"
 using namespace std;
 
 
@@ -48,33 +53,71 @@ struct tokenDetector {
 } detector;
 
 
-/*
+
 class PassWordGenerator {
 public:
-    PassWordGenerator(vector<string> tokens) {}
+    PassWordGenerator(vector<string> tokens);
 
-    string getRandomPassword(int numWords) {}
+    string getRandomPassword(int numWords);
 
-    void setIterationLength(int numWords) {}
+    void setIterationLength(int numWords);
 
-    string next() {}
+    string next();
 
-    bool hasNext() {}  // false condition when curser is at length of tokens
+    bool hasNext();  // false condition when curser is at length of tokens
 
 private:
     vector<string> _tokens;
+    int iterationLength;
 
-} passwordGenerator;
+};
 
-PassWordGenerator::PassWordGenerator(vector<string> tokens) : _tokens(tokens) {
+PassWordGenerator::PassWordGenerator(vector<string> tokens){
+    _tokens = tokens;
     cout << "Password generator class constructed" << endl;
-    int numWords = tokens.size();
+    //int numWords = tokens.size();
 }
 
 string PassWordGenerator::getRandomPassword(int numWords) {
+  std::string result;
+  std::set<int> indexes;
+  std::vector<std::string> choices;
+  int max_index = _tokens.size();
 
+  while (indexes.size() < min(numWords, max_index))
+  {
+
+    int random_index = rand() % max_index;
+    if (indexes.find(random_index) == indexes.end())
+    {
+        choices.push_back(_tokens[random_index]);
+        indexes.insert(random_index);
+    }
+  }
+  if (!choices.empty())
+  {
+  // Convert all but the last element to avoid a trailing ","
+  for(int i = 0; i < numWords; i++){
+    result = result + choices[i] + " ";
+    }
+  }
+  return result;
 }
-*/
+void PassWordGenerator::setIterationLength(int numWords) {
+ iterationLength = numWords;
+}
+
+std::string PassWordGenerator::next() {
+  while(hasNext()){
+
+  }
+  return "hi";
+}
+
+bool PassWordGenerator::hasNext() {
+  return 1;
+}
+
 
 
 
@@ -96,5 +139,11 @@ int main(int argc, char** argv) {
 
     // run the parser to tokenize the file
     vector<string> parsedWords  = detector.getUnique(file);
+    PassWordGenerator* pwGenerator = new PassWordGenerator(parsedWords);
+    cout << pwGenerator->getRandomPassword(4) << endl;
+    cout << pwGenerator->getRandomPassword(4) << endl;
+    cout << pwGenerator->getRandomPassword(4) << endl;
+    cout << pwGenerator->getRandomPassword(4) << endl;
+    cout << pwGenerator->getRandomPassword(4) << endl;
 
 }
