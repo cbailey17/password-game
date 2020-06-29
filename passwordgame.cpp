@@ -58,6 +58,8 @@ class PassWordGenerator {
 public:
     PassWordGenerator(vector<string> tokens);
 
+    PassWordGenerator(const PassWordGenerator &copy);
+
     string getRandomPassword(int numWords);
 
     void setIterationLength(int numWords);
@@ -69,13 +71,21 @@ public:
 private:
     vector<string> _tokens;
     int iterationLength;
-
+    // int wordPlace;
+    // int curindex;
 };
 
 PassWordGenerator::PassWordGenerator(vector<string> tokens){
     _tokens = tokens;
     cout << "Password generator class constructed" << endl;
-    //int numWords = tokens.size();
+    // wordPlace = 0;
+    // curindex = 0;
+}
+
+PassWordGenerator::PassWordGenerator(const PassWordGenerator &copy){
+  std::vector<std::string> _tokens = copy._tokens;
+  int iterationLength = copy.iterationLength;
+
 }
 
 string PassWordGenerator::getRandomPassword(int numWords) {
@@ -108,18 +118,71 @@ void PassWordGenerator::setIterationLength(int numWords) {
 }
 
 std::string PassWordGenerator::next() {
-  while(hasNext()){
-
+  std::string nextResult;
+  static int i,j,k,l = 0;
+  if(hasNext()){
+    nextResult = _tokens[i] + " " + _tokens[j] + " " + _tokens[k] + " " + _tokens[l] + " ";
+    l++;
+    if(l == _tokens.size()){
+      k++;
+      l=0;
+    }
+    if(k == _tokens.size()){
+      j++;
+      l=0;
+      k=0;
+    }
+    if(j == _tokens.size()){
+      i++;
+      l=0;
+      k=0;
+      j=0;
+    }
   }
-  return "hi";
+  return nextResult;
 }
 
 bool PassWordGenerator::hasNext() {
-  return 1;
+  // if  (wordPlace < iterationLength && curindex < _tokens.size()){
+  //     return 1;
+  // }
+  return 0;
 }
 
+class PassWordGuesser {
+public:
+    PassWordGuesser(PassWordGenerator& Gen, int numWords);
+
+    void guessPW();
+
+    void bogoSearch(std::string password);
+
+    void sequentialSearch(std::string password);
 
 
+private:
+  std::string correctPassword;
+  PassWordGenerator pwgen;
+};
+
+PassWordGuesser::PassWordGuesser(PassWordGenerator& Gen, int numWords){
+    correctPassword = Gen.getRandomPassword(numWords);
+    PassWordGenerator pwgen(Gen);
+}
+
+void PassWordGuesser::guessPW(){
+
+}
+
+void PassWordGuesser::bogoSearch(std::string password){
+  while(correctPassword != pwgen.getRandomPassword());
+
+}
+
+void PassWordGuesser::sequentialSearch(std::string password){
+
+
+}
 
 // Driver: PasswordGame
 int main(int argc, char** argv) {
@@ -145,5 +208,7 @@ int main(int argc, char** argv) {
     cout << pwGenerator->getRandomPassword(4) << endl;
     cout << pwGenerator->getRandomPassword(4) << endl;
     cout << pwGenerator->getRandomPassword(4) << endl;
+
+    cout << pwGenerator->next() << endl;
 
 }
