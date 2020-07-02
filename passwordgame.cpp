@@ -151,7 +151,6 @@ string PassWordGenerator::next() {
     if (!hasNext()) {
         return "No more permutations!";
     }
-    // printAllKLength(_tokens, maxi, iterationLength);
     nextResult = combinations[nextIt];
     nextIt++;
     cout << combinations.size() << endl;
@@ -211,9 +210,11 @@ public:
 
     void guessPW();
 
-    bool bogoSearch(std::string password);
+    void bogoSearch(std::string password, unsigned int numWords);
 
-    bool sequentialSearch(std::string password);
+    void sequentialSearch(std::string password);
+
+    void runThreads(string pw, unsigned int numWords);
 
 
 private:
@@ -231,18 +232,47 @@ PassWordGuesser::PassWordGuesser(PassWordGenerator& gen, int numWords) : gen(&ge
 void PassWordGuesser::guessPW() {
 }
 
-bool PassWordGuesser::bogoSearch(std::string correctPassword) {
-    cout << "Attempting to guess the password" << endl;
-    while (correctPassword != gen->getRandomPassword(pwLength));
-    cout << "bogoSearch found the password!" << endl;
-    return 1;
+void PassWordGuesser::bogoSearch(std::string correctPassword, unsigned int numWords) {
+    cout << "Attempting to guess the password with bogo" << endl;
+    while (!threadFinished) {
+        string tempPwd = gen->getRandomPassword(numWords);
+        cout << "bongo guess: " << tempPwd << endl;
+        if (tempPwd == correctPassword) {
+            cout << "bogoSearch found the password!" << endl;
+            cout << "The password from bogo is: " << tempPwd << endl;
+            threadFinished = true;
+            return;
+        }
+    }
 }
 
-bool PassWordGuesser::sequentialSearch(std::string correctPassword) {
-    while (correctPassword != gen->next());
-    cout << "sequentialSearch found the password!" << endl;
-    return 1;
+void PassWordGuesser::sequentialSearch(std::string correctPassword) {
+    cout << "Attempting to guess the password with sequential" << endl;
+    threadFinished = false;
+    while (!threadFinished) {
+        string tempPwd2 = gen->next();
+        cout << "sequential guess: " << tempPwd2 << endl;
+        if (tempPwd2 == correctPassword) {
+            cout << "sequential Search found the password!" << endl;
+            cout << "The password from sequential is: " << tempPwd2 << endl;
+            threadFinished = true;
+            return;
+        }
+        cout << "sequentialSearch found the password!" << endl;
+        return;
+    }
 }
+
+void PassWordGuesser::runThreads(string pw, unsigned int numWords) {
+    thread bogo(&PassWordGuesser::bogoSearch, this, pw, numWords);
+    thread sequential(&PassWordGuesser::sequentialSearch, this, pw);
+    bogo.join();
+    sequential.join();
+}
+
+
+
+
 
 // Driver: PasswordGame
 int main(int argc, char** argv) {
@@ -274,12 +304,6 @@ int main(int argc, char** argv) {
 
     cout << "\nYour random password is: " << pw << endl;
 
-    //std::thread bogo(pg->bogoSearch, pw);
-  
-    //bogo.join();
-
-    cout << "Waiting" << endl;
-
-   // std::thread sequentialSearch(&PassWordGuesser::sequentialSearch, pwGenerator);*/
+    pg->runThreads(pw, numWords);
 
 }
