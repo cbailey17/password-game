@@ -1,2 +1,3 @@
 This is A test!
-This class shall use a PasswordGenerator to establish a random password with the number of tokens equal to what the user specified during program launch. It shall then create two threads which will each begin guessing passwords (they must obviously know the password they're trying to break, so it should arrive as a parameter). The first thread shall use the PasswordGenerator's iterator to step through each combination while the second thread simply keeps requesting new random passwords from the generator until one matches. I recommend using the observer design pattern here, for the moment one of them finds the password, the other no longer needs to search. Have the Password Guesser loop or sleep until one of them call's its notify method
+This class shall use a PasswordGenerator to
+establish a random password with the number

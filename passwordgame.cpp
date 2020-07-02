@@ -12,7 +12,6 @@
 //#include "PassWordGenerator.h"
 using namespace std;
 
-
 struct tokenDetector {
     map<string, int>  fileWords;
     string line, temp_str;
@@ -64,8 +63,6 @@ struct tokenDetector {
     }
 } detector;
 
-
-
 class PassWordGenerator {
 public:
     PassWordGenerator(vector<string> tokens);
@@ -80,26 +77,33 @@ public:
 
     bool hasNext();  // false condition when curser is at length of tokens
 
-    void permute(string prefix, int size, int length);
+    void permute( string prefix, int size, int length);
+
+    void printAllKLength( int n,int k);
+    // long fact(int num);
 private:
     vector<string> _tokens;
     int iterationLength;
     string nextResult;
     int nextIt;
+    vector<string> combinations;
 
 };
 
 PassWordGenerator::PassWordGenerator(vector<string> tokens){
     _tokens = tokens;
     cout << "Password generator class constructed" << endl;
-    // wordPlace = 0;
-    // curindex = 0;
+    // std::sort(_tokens.begin(), _tokens.end());
+    nextIt = 1;
+
 }
 
-PassWordGenerator::PassWordGenerator(const PassWordGenerator &copy){
-  std::vector<std::string> _tokens = copy._tokens;
-  int iterationLength = copy.iterationLength;
-
+PassWordGenerator::PassWordGenerator(const PassWordGenerator &copy){ // copy constructor
+  _tokens = copy._tokens;
+  iterationLength = copy.iterationLength;
+  nextResult = copy.nextResult;
+  nextIt = copy.nextIt;
+  combinations = copy.combinations;
 }
 
 string PassWordGenerator::getRandomPassword(int numWords) {
@@ -127,56 +131,54 @@ string PassWordGenerator::getRandomPassword(int numWords) {
   }
   return result;
 }
+
 void PassWordGenerator::setIterationLength(int numWords) {
  iterationLength = numWords;
+ combinations.clear(); // clear vector for new use with new iterationLength
+ printAllKLength( _tokens.size(), iterationLength); // now use vector
 }
 
 std::string PassWordGenerator::next() {
-
   if(!hasNext()){
     return "No more permutations!";
-  }
+}
+  // printAllKLength(_tokens, maxi, iterationLength);
+  nextResult = combinations[nextIt];
   nextIt++;
   return nextResult;
 }
 
-    void PassWordGenerator::permute(string prefix, int size, int length) {
-    int idx = 0;
-    // Base case: k is 0,
+
+  // looked online for thise permutation code
+void PassWordGenerator::permute(string prefix, int size, int length){
+    // Base case: length is 0 so push into new vector
     // print prefix
-    while(idx < nextIt){
-      if (length == 0)
-      {
-          nextResult = prefix;
-          idx++;
-          return;
-      }
-
-      // One by one add all characters
-      // from set and recursively
-      // call for k equals to k-1
-      for (int i = 0; i < size; i++)
-      {
-          string newPrefix;
-
-          // Next character of input added
-          newPrefix = prefix + _tokens[i] + " ";
-
-          // k is decreased, because
-          // we have added a new character
-          permute(newPrefix, size, length - 1);
-      }
+    if (length == 0){
+        combinations.push_back(prefix);
+        return;
     }
-}
-  // for(int i = 0; i < iterationLength; i++){
-  //   nextResult = nextResult + combinations[i] + " ";
-  //   }
 
+    // One by one add all characters
+    // from tokenslist and recursively
+    for (int i = 0; i < size; i++)
+    {
+        string newPrefix;
+        // next string added
+        newPrefix = prefix + _tokens[i] + " ";
+        // added new string
+        permute( newPrefix, size, length - 1);
+      }
+
+}
+
+  void PassWordGenerator::printAllKLength( int n,int k){
+      permute("", n, k);
+  }
 
 bool PassWordGenerator::hasNext() {
-  // if  (wordPlace < iterationLength && curindex < _tokens.size()){
-  //     return 1;
-  // }
+  if(nextIt < combinations.size()){
+   return 1;
+  }
   return 0;
 }
 
@@ -234,15 +236,29 @@ int main(int argc, char** argv) {
         return 0;
     }
 
+
     // run the parser to tokenize the file
     vector<string> parsedWords  = detector.getUnique(file);
     PassWordGenerator* pwGenerator = new PassWordGenerator(parsedWords);
-    cout << pwGenerator->getRandomPassword(4) << endl;
-    cout << pwGenerator->getRandomPassword(4) << endl;
-    cout << pwGenerator->getRandomPassword(4) << endl;
-    cout << pwGenerator->getRandomPassword(4) << endl;
-    cout << pwGenerator->getRandomPassword(4) << endl;
 
-    cout << pwGenerator->next() << endl;
+    // pwGenerator->setIterationLength(4);
+    cout << pwGenerator->getRandomPassword(3) << endl;
+    cout << pwGenerator->getRandomPassword(2) << endl;
+    cout << pwGenerator->getRandomPassword(2) << endl;
+    pwGenerator->setIterationLength(4);
+    cout << pwGenerator->hasNext()<< endl;
+    cout << pwGenerator->next()<< endl;
+    cout << pwGenerator->next()<< endl;
+
+
+
+
+    // cout << pwGenerator->next()<< endl;
+    // pwGenerator->permute("", 53, 4);
+    // cout << pwGenerator->next() << endl;
+    // cout << pwGenerator->next() << endl;
+    // cout << pwGenerator->next() << endl;
+    // cout << pwGenerator->next() << endl;
+    // cout << pwGenerator->next() << endl;
 
 }
