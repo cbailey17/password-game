@@ -73,6 +73,8 @@ public:
 
     void setIterationLength(int numWords);
 
+    int getIterationLength();
+
     string next();
 
     bool hasNext();  // false condition when curser is at length of tokens
@@ -138,6 +140,9 @@ void PassWordGenerator::setIterationLength(int numWords) {
  printAllKLength( _tokens.size(), iterationLength); // now use vector
 
 }
+int PassWordGenerator::getIterationLength(){
+  return iterationLength;
+}
 
 string PassWordGenerator::next() {
   if(!hasNext()){
@@ -186,7 +191,9 @@ bool PassWordGenerator::hasNext() {
 
 class PassWordGuesser {
 public:
-    PassWordGuesser(PassWordGenerator& gen, int numWords);
+    PassWordGuesser(const PassWordGenerator &pwGen);
+
+    PassWordGuesser( const PassWordGuesser &copy);
 
     void guessPW();
 
@@ -197,13 +204,21 @@ public:
 
 private:
   std::string correctPassword;
-  PassWordGenerator* gen;
+  PassWordGenerator* pwGen;
   int pwLength;
 };
 
-PassWordGuesser::PassWordGuesser(PassWordGenerator& gen, int numWords): gen(&gen){
-    correctPassword = gen.getRandomPassword(numWords);
-    pwLength = numWords;
+PassWordGuesser::PassWordGuesser(const PassWordGenerator &gen): pwGen(&gen){
+
+    pwLength = pwGen->getIterationLength();
+    correctPassword = pwGen->getRandomPassword(pwLength);
+
+}
+
+PassWordGuesser::PassWordGuesser(PassWordGuesser copy){
+  pwGen = copy.pwGen;
+  pwLength = copy.pwLength;
+  correctPassword = copy.correctPassword;
 }
 
 void PassWordGuesser::guessPW(){
@@ -213,13 +228,13 @@ void PassWordGuesser::guessPW(){
 }
 
 bool PassWordGuesser::bogoSearch(std::string password){
-  while(correctPassword != gen->getRandomPassword(pwLength));
+  while(correctPassword != pwGen->getRandomPassword(pwLength));
   cout << "bogoSearch found the password!" << endl;
   return 1;
 }
 
 bool PassWordGuesser::sequentialSearch(std::string password){
-  while(correctPassword != gen->next());
+  while(correctPassword != pwGen->next());
   cout << "sequentialSearch found the password!" << endl;
   return 1;
 }
@@ -250,6 +265,8 @@ int main(int argc, char** argv) {
     pwGenerator->setIterationLength(2);
     cout << pwGenerator->next()<< endl;
     cout << pwGenerator->next()<< endl;
+
+    PassWordGuesser* pwGuesser = new PassWordGuesser(pwGenerator);
 
 
     // cout << pwGenerator->next()<< endl;
