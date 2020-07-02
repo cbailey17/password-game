@@ -1,3 +1,6 @@
 This is A test!
 This class shall use a PasswordGenerator to
 establish a random password with the number
+First, the user shall launch the entire program with a single
+command. At launch time, the first command line argument (after the program name)
+will indicate the name of an ASCII coded text file to load in the current directory.
