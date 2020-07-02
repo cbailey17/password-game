@@ -158,7 +158,7 @@ string PassWordGenerator::next() {
 
     nextResult = combinations[nextIt];
     nextIt++;
-    cout << combinations.size() << endl;
+    cout << nextResult<< endl;
     return nextResult;
 
 }
@@ -236,15 +236,23 @@ void PassWordGuesser::guessPW() {
 }
 
 bool PassWordGuesser::bogoSearch(std::string correctPassword) {
-    cout << "Attempting to guess the password" << endl;
-    while (correctPassword != gen->getRandomPassword(pwLength));
+    string guess;
+    cout << "Attempting to randomly guess the password" << endl;
+    while (correctPassword != guess){
+      guess = gen->getRandomPassword(pwLength);
+      cout << guess << endl;
+    }
+
     cout << "bogoSearch found the password!" << endl;
+    cout << "Correct Password: " << correctPassword << endl;
     return 1;
 }
 
 bool PassWordGuesser::sequentialSearch(std::string correctPassword) {
+    cout << "Attempting to sequentially guess the password" << endl;
     while (correctPassword != gen->next());
     cout << "sequentialSearch found the password!" << endl;
+    cout << "Correct Password: " << correctPassword << endl;
     return 1;
 }
 
@@ -276,16 +284,20 @@ int main(int argc, char** argv) {
     unsigned int numWords = pwGenerator->prompt();
 
     PassWordGuesser* pg = new PassWordGuesser(*pwGenerator, numWords);
+
     pwGenerator->setIterationLength(numWords);
+
     string pw = pwGenerator->getRandomPassword(numWords);
 
     cout << "\nYour random password is: " << pw << endl;
 
     cout << pwGenerator->getRandomPassword(numWords) << endl;
-    cout << pwGenerator->next()<< endl;
-    cout << pwGenerator->next()<< endl;
-    cout << pwGenerator->next()<< endl;
-    cout << pwGenerator->next()<< endl;
+    // cout << pwGenerator->next()<< endl;
+    // cout << pwGenerator->next()<< endl;
+    // cout << pwGenerator->next()<< endl;
+    // cout << pwGenerator->next()<< endl;
+
+    while(!pg->bogoSearch(pw));
     //std::thread bogo(pg->bogoSearch, pw);
 
     //bogo.join();
