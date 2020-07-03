@@ -12,9 +12,11 @@
 
 //#include "PassWordGenerator.h"
 using namespace std;
-
+time_t timer;
 static bool threadFinished = false;
 
+// Unique Token Detector
+//-------------------------------------------------------------------------------------------------------------------
 struct tokenDetector {
     map<string, int>  fileWords;
     string line, temp_str;
@@ -65,10 +67,11 @@ struct tokenDetector {
         return;
     }
 } detector;
+//-------------------------------------------------------------------------------------------------------------------
 
 
-
-
+// PassWordGenerator
+//-------------------------------------------------------------------------------------------------------------------
 class PassWordGenerator {
 public:
     PassWordGenerator(vector<string> tokens);
@@ -104,6 +107,7 @@ PassWordGenerator::PassWordGenerator(vector<string> tokens) {
     std::sort(_tokens.begin(), _tokens.end());
     nextIt = 1;
     iterationLength;
+    srand(time(&timer));
 
 }
 
@@ -120,6 +124,7 @@ string PassWordGenerator::getRandomPassword(unsigned int numWords) {
     std::set<int> indexes;
     std::vector<std::string> choices;
     unsigned int max_index = _tokens.size();
+
 
     while (indexes.size() < min(numWords, max_index))
     {
@@ -196,18 +201,15 @@ unsigned int PassWordGenerator::prompt() {
     cin >> num;
     return num;
 }
+//-------------------------------------------------------------------------------------------------------------------
 
 
 
-
-
-
-
+// PassWordGusser
+//-------------------------------------------------------------------------------------------------------------------
 class PassWordGuesser {
 public:
     PassWordGuesser(PassWordGenerator& gen, int numWords);
-
-    void guessPW();
 
     void bogoSearch(std::string password);
 
@@ -219,7 +221,7 @@ public:
 private:
     std::string correctPassword;
     PassWordGenerator* gen;
-    int pwLength;
+    unsigned int pwLength;
 
 };
 
@@ -228,8 +230,6 @@ PassWordGuesser::PassWordGuesser(PassWordGenerator& gen, int numWords) : gen(&ge
     pwLength = numWords;
 }
 
-void PassWordGuesser::guessPW() {
-}
 void PassWordGuesser::bogoSearch(std::string correctPassword) {
     string guess;
     cout << "Attempting to randomly guess the password" << endl;
@@ -254,7 +254,6 @@ void PassWordGuesser::sequentialSearch(std::string correctPassword) {
             cout << "sequential Search found the password!" << endl;
             cout << "The password from sequential is: " << tempPwd2 << endl;
             threadFinished = true;
-
         }
     }
     cout << "sequentialSearch found the password!" << endl;
@@ -262,19 +261,21 @@ void PassWordGuesser::sequentialSearch(std::string correctPassword) {
 }
 
 void PassWordGuesser::runThreads(string pw) {
+    srand(rand()); //reset rand seed before search
     thread bogo(&PassWordGuesser::bogoSearch, this, pw);
     thread sequential(&PassWordGuesser::sequentialSearch, this, pw);
     bogo.join();
     sequential.join();
 }
-
+//-------------------------------------------------------------------------------------------------------------------
 
 
 
 
 // Driver: PasswordGame
+//-------------------------------------------------------------------------------------------------------------------
 int main(int argc, char** argv) {
-
+    srand(time(&timer)); // set rand seed
     // make sure file was given at runtime
     if (argc != 2) {
         std::cout << "ASCII coded text file needed!\n" << std::endl;
@@ -296,7 +297,9 @@ int main(int argc, char** argv) {
 
 
     unsigned int numWords = pwGenerator->prompt();
-    pwGenerator->setIterationLength(numWords);
+
+    pwGenerator->setIterationLength(numWords); //set internal iterationLength
+
     PassWordGuesser* pg = new PassWordGuesser(*pwGenerator, numWords);
 
     string pw = pwGenerator->getRandomPassword(numWords);
