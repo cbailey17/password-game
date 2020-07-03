@@ -1,5 +1,8 @@
 #include "password_project.h"
 
+// Unique Token Detector
+// token detector performs the necessary trimming of the ASCII text file and creates a vector of unique tokens
+
 vector<string> tokenDetector::getUnique(ifstream& file) {  // add tokens from the file to a map in order to make sure theyre unique and then add to the vector
     while (getline(file, line)) {
         stringstream ss(line);

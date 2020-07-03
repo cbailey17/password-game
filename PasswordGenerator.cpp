@@ -47,7 +47,6 @@ string PassWordGenerator::getRandomPassword(unsigned int numWords) {
 void PassWordGenerator::setIterationLength(int numWords) {
     iterationLength = numWords;
     combinations.clear(); // clear vector for new use with new iterationLength
-
     printAllKLength(_tokens.size(), iterationLength); // now use vector
 
 }
@@ -56,22 +55,16 @@ string PassWordGenerator::next() {
     if (!hasNext()) {
         return "No more permutations!";
     }
-    if (!combinations.empty()) {
-        nextResult = combinations.front();
-        combinations.erase(combinations.begin());
-        return nextResult;
-    }
-    return "skip";
+    nextResult = combinations[nextIt];
+    nextIt++;
+    return nextResult;
 
 }
-
 
 void PassWordGenerator::permute(string prefix, long double size, long double length) {
     // Base case: length is 0 so push into new vector
     // print prefix
     if (length == 0) {
-        cout << "  " << endl;                                                                              //I think helps clear something
-        //cout << prefix << endl;                                                                   If you would like to see the sequential results
         combinations.push_back(prefix);
         return;
     }
@@ -90,9 +83,7 @@ void PassWordGenerator::permute(string prefix, long double size, long double len
 }
 
 void PassWordGenerator::printAllKLength(long double n, long double k) {
-    thread comboMaker(&PassWordGenerator::permute, this, "", n, k);
-    comboMaker.detach();
-    this_thread::yield();
+    permute("", n, k);
 }
 
 bool PassWordGenerator::hasNext() {
@@ -108,5 +99,3 @@ unsigned int PassWordGenerator::prompt() {
     cin >> num;
     return num;
 }
-
-//----------------------------------------------------------------------------------------------------------------------------------
